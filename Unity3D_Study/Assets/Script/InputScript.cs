@@ -5,7 +5,10 @@ using UnityEngine;
 public class InputScript : MonoBehaviour
 {
     public float moveSpeed = 5f;
-    public Animator anicon_PicoChan; // 애니메이터 변수 선언
+    public Animator anicon_PicoChan;
+
+    // 내부적으로 사용할 스무스된 속도값 보관
+    private float smoothSpeed = 0f;
 
     void Update()
     {
@@ -24,11 +27,12 @@ public class InputScript : MonoBehaviour
             transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * 10f);
         }
 
-        // 애니메이터 - 걷기
-        bool isWalk = 0 < moveDirection.magnitude;
-        anicon_PicoChan.SetBool("ISWALK", isWalk); // Setbool(파라미터의 이름, 설정 값)
+        // Speed 값을 Lerp로 부드럽게 전환
+        float targetSpeed = moveDirection.magnitude;
+        smoothSpeed = Mathf.Lerp(smoothSpeed, targetSpeed, Time.deltaTime * 10f);
+        anicon_PicoChan.SetFloat("Speed", smoothSpeed);
 
-        // 애니메이터 - 공격 (좌클릭)
+        // 애니메이터 - 공격 (좌클릭 시 Trigger)
         if (Input.GetMouseButtonDown(0))
         {
             anicon_PicoChan.SetTrigger("ATTACK");
